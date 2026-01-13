@@ -1,7 +1,8 @@
 const mongoose=require('mongoose')
+require('dotenv').config()
 
 const DBconnection=()=>{
-    mongoose.connect('mongodb://127.0.0.1:27017/Productwala').then(()=>{console.log("DB connected")}).catch(()=>{console.log("DB connection Failed")})    
+    mongoose.connect(process.env.DB_URL).then(()=>{console.log("DB connected")}).catch(()=>{console.log("DB connection Failed")})    
 }
 
 module.exports=DBconnection
