@@ -24,6 +24,8 @@ app.use('/order',orderRoute)
 app.use('/cart',cartRoute)
 app.use(globalErrorHandler)
 
-app.listen(process.env.PORT,()=>{
+const port=process.env.PORT || 5000
+
+app.listen(port,()=>{
     console.log("Server Started")
 })
