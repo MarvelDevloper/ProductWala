@@ -1,7 +1,7 @@
+const { refreshToken, accessToken } = require("../Auth/generateToken")
 const { asyncHandler, ApiError } = require("../middleware/ErrorHandler")
 const User = require("../model/userModel")
 const bcryptjs = require('bcryptjs')
-const jwt = require('jsonwebtoken')
 
 const userController = {
     signup: asyncHandler(async (req, res) => {
@@ -31,7 +31,10 @@ const userController = {
         if (!email || !password) {
             throw new ApiError('all fields required', 400)
         }
+        
         const existUser = await User.findOne({ email: email })
+
+        console.log(existUser)
 
         if (!existUser) {
             throw new ApiError('invalid password or email', 400)
@@ -43,8 +46,12 @@ const userController = {
             throw new ApiError('invalid password or email', 400)
         }
 
-        const token = await jwt.sign({ id: existUser._id, email: existUser.email, role: existUser.role }, process.env.SECRET_KEY, { expiresIn: '1d' })
-        return res.status(200).json({ msg: "login successful!", token: token })
+        const access=accessToken({id:existUser._id,email:existUser.email,role:existUser.role})
+
+        const refresh=refreshToken({id:existUser._id,email:existUser.email,role:existUser.role})
+
+        res.cookie('refreshtoken',refresh,{httpOnly:true,secure:false,sameSite:'None',maxAge: 7 * 24 * 60 * 60 * 1000,})
+        return res.status(200).json({ msg: "login successful!", accesstoken: access ,refreshtoken:refresh})
     }),
     profile: asyncHandler(async (req, res) => {
         const userId = req.userid
